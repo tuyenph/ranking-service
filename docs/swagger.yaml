@@ -1,0 +1,105 @@
+basePath: /
+definitions:
+  models.InteractionRequest:
+    properties:
+      type:
+        description: e.g., view, like, comment, share, watch_time
+        type: string
+      user_id:
+        description: 'Required: Owner of the video.'
+        type: string
+      video_id:
+        type: string
+      weight:
+        description: Used for interactions like watch_time.
+        type: number
+    required:
+    - type
+    - user_id
+    - video_id
+    - weight
+    type: object
+info:
+  contact: {}
+  description: Swagger docs for Ranking Service API
+  title: Ranking Service API
+  version: "1.0"
+paths:
+  /users/{userID}/videos/top:
+    get:
+      consumes:
+      - application/json
+      description: Get the top ranked videos for a specific user.
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: Number of videos to retrieve
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Retrieve personalized top videos for a user
+      tags:
+      - Users
+  /videos/{video_id}/interaction:
+    post:
+      consumes:
+      - application/json
+      description: Update a video's score by processing interactions (views, likes,
+        etc.). The payload must include userID.
+      parameters:
+      - description: Video ID
+        in: path
+        name: video_id
+        required: true
+        type: string
+      - description: Interaction payload
+        in: body
+        name: interaction
+        required: true
+        schema:
+          $ref: '#/definitions/models.InteractionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update video score based on interaction
+      tags:
+      - Videos
+  /videos/top:
+    get:
+      consumes:
+      - application/json
+      description: Get the top ranked videos globally.
+      parameters:
+      - description: Number of videos to retrieve
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Retrieve global top videos
+      tags:
+      - Videos
+swagger: "2.0"
