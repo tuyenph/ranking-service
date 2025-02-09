@@ -1,0 +1,27 @@
+stages:
+  - buildAndPush
+
+variables:
+  IMAGE_NAME: "ranking-service"
+  REPO_NAME: "test"
+  GAR_REGION: "asia-east2"
+  PROJECT_ID: "test"
+  IMAGE_TAG: "${CI_COMMIT_REF_NAME:-${CI_COMMIT_SHORT_SHA}}"
+
+before_script:
+  - echo "$GCP_SERVICE_ACCOUNT_KEY" | gcloud auth activate-service-account --key-file=-
+  - gcloud auth configure-docker "$GAR_REGION-docker.pkg.dev"
+
+build:
+  stage: buildAndPush
+  image: docker:latest
+  services:
+    - docker:dind
+  rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /\[CI\]/'
+  script:
+    - echo "Building Docker image with docker buildx $IMAGE_TAG"
+    - docker buildx create --use --name builder
+    - docker buildx build -o type=image --file=Dockerfile --platform linux/amd64,linux/arm64 \
+      -t "$GAR_REGION-docker.pkg.dev/$PROJECT_ID/$REPO_NAME_MAIN/$IMAGE_NAME:$IMAGE_TAG" \
+      --push .

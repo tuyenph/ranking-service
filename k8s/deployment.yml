@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ranking-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ranking-service
+  template:
+    metadata:
+      labels:
+        app: ranking-service
+    spec:
+      containers:
+      - name: ranking-service
+        image: ranking-service:latest
+        ports:
+        - containerPort: 8080

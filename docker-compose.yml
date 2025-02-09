@@ -1,0 +1,36 @@
+services:
+  ranking_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ranking-service:latest
+    restart: always
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8080:8080"
+
+  postgres:
+    image: postgres:16.4
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: video_ranking
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.4
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis_data:/data
+
